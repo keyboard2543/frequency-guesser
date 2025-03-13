@@ -156,6 +156,7 @@
             }
             const diff = Math.abs(guess - currentFrequency);
             let message = `You guessed ${guess} Hz. The actual frequency was ${currentFrequency} Hz. `;
+            message += diff > 0 ? `You were off by ${diff} Hz. ` : "";
             if (diff === 0) {
                 message += "🎉 Amazing! You got it right!";
             } else if (diff <= 50) {
