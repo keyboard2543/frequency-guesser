@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Frequency</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        h2 {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        button, input {
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            transition: transform 0.2s;
+        }
+        button {
+            background: #00c6ff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0072ff;
+            transform: scale(1.05);
+        }
+        input {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 79%;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeInModal 0.3s forwards;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: black;
+            max-width: 300px;
+            transform: scale(0.8);
+            animation: popIn 0.3s forwards;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+        .modal button {
+            background: #00c6ff;
+            color: white;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎵 Guess the Frequency 🎵</h2>
+        <p>Listen and guess the frequency (80Hz - 2300Hz)</p>
+        <button onclick="playFrequency()">🔊 Play Sound</button>
+        <br>
+        <input type="number" id="guess" placeholder="Enter frequency (Hz)">
+        <button onclick="checkGuess()" style="width: 50%;">✅ Submit Guess</button>
+    </div>
+    
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h3>Result</h3>
+            <p id="result"></p>
+            <button onclick="closeModal()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentFrequency = 0;
+        const minFreq = 80, maxFreq = 2300;
+        
+        function getRandomFrequency() {
+            const ratio = Math.random();
+            return Math.floor(minFreq + (maxFreq - minFreq) * Math.pow(ratio, 2));
+        }
+
+        function playFrequency() {
+            if (currentFrequency === 0) {
+                currentFrequency = getRandomFrequency();
+            }
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(currentFrequency, audioCtx.currentTime);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 2 * 1000);
+        }
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guess').value);
+            if (isNaN(guess)) {
+                document.getElementById('result').textContent = "⚠️ Please enter a valid number.";
+                document.getElementById('resultModal').style.display = "flex";
+                return;
+            }
+            const diff = Math.abs(guess - currentFrequency);
+            let message = `You guessed ${guess} Hz. The actual frequency was ${currentFrequency} Hz. `;
+            if (diff === 0) {
+                message += "🎉 Amazing! You got it right!";
+            } else if (diff <= 50) {
+                message += "🔥 Very close! Try again!";
+            } else {
+                message += "🎵 Keep trying! You'll get better!";
+            }
+            document.getElementById('result').textContent = message;
+            document.getElementById('resultModal').style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = "none";
+            document.getElementById('guess').value = "";
+            currentFrequency = 0;
+        }
+    </script>
+</body>
+</html>
