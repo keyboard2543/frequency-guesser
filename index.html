@@ -157,7 +157,7 @@
             const diff = Math.abs(guess - currentFrequency);
             
             // Calculate the threshold based on the frequency
-            const threshold = currentFrequency * 0.1;
+            const threshold = currentFrequency * (((1+Math.sqrt(5))/2)-1)/10;
             
             let message = `You guessed ${guess} Hz. The actual frequency was ${currentFrequency} Hz. `;
             message += diff > 0 ? `You were off by ${diff} Hz. ` : "";
